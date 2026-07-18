@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premium Text to Speech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="styles.css" />  
+</head>
+<body>
+  <div class="noise"></div>
+
+  <main class="shell">
+    <section class="panel hero">
+      <div class="hero-top">
+        <div class="brand">
+          <div class="brand-badge"><i class="fa-solid fa-wave-square"></i></div>
+          <div>
+            <h1>Premium Voice Studio</h1>
+            <p>Modern text to speech workspace</p>
+          </div>
+        </div>
+        <div class="status-pill"><span class="status-dot"></span> Ready to generate voice</div>
+      </div>
+
+      <div class="hero-main">
+        <div class="eyebrow"><i class="fa-solid fa-microphone-lines"></i> Supports many languages and voices available in your browser</div>
+        <h2 class="title">Turn <span>anything</span> into clean speech.</h2>
+        <p class="subtitle">
+          Paste notes, scripts, articles, lessons, ads, or full documents into the editor. Long content is automatically split into smaller pieces so playback remains smooth.
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <i class="fa-solid fa-gem"></i>
+            <div><b>Premium UI</b><span>Glassmorphism cards, glowing gradients, and elegant motion for a polished feel.</span></div>
+          </div>
+          <div class="feature">
+            <i class="fa-solid fa-infinity"></i>
+            <div><b>Long text support</b><span>No visible text limit. Playback chunks are auto-created for long content.</span></div>
+          </div>
+          <div class="feature">
+            <i class="fa-solid fa-music"></i>
+            <div><b>Background music</b><span>Add ambient music or DJ mix and balance it with voice playback.</span></div>
+          </div>
+          <div class="feature">
+            <i class="fa-solid fa-shield-halved"></i>
+            <div><b>Privacy-first</b><span>Everything runs locally in the browser for instant usage and easy editing.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="hero-art">
+          <div class="waveform" aria-hidden="true">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><strong id="charCount">0</strong><span>Characters</span></div>
+          <div class="stat"><strong id="chunkCount">0</strong><span>Chunks</span></div>
+          <div class="stat"><strong id="voiceCount">0</strong><span>Available voices</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel editor">
+      <div class="editor-head">
+        <h2><i class="fa-solid fa-pen-to-square"></i> Speech Editor</h2>
+        <div class="toolbar">
+          <button class="tool" id="loadSampleBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Load sample</button>
+          <button class="tool" id="copyBtn"><i class="fa-regular fa-copy"></i> Copy text</button>
+          <button class="tool" id="clearBtn"><i class="fa-solid fa-broom"></i> Clear</button>
+        </div>
+      </div>
+
+      <div class="text-box">
+        <div class="textarea-wrap">
+          <textarea id="textInput" placeholder="Paste or type your text here... The editor accepts long text and splits it into smaller speech-safe chunks automatically."></textarea>
+        </div>
+
+        <div class="meta-row">
+          <div class="card">
+            <label for="voiceSelect"><i class="fa-solid fa-user-astronaut"></i> Voice / Language</label>
+            <div class="voices">
+              <select id="voiceSelect"></select>
+              <div class="voice-tools">
+                <button class="tool" id="refreshVoicesBtn"><i class="fa-solid fa-rotate"></i> Refresh voices</button>
+              </div>
+            </div>
+            <div class="tag-list">
+              <span class="tag"><i class="fa-solid fa-earth-africa"></i> Multi-language</span>
+              <span class="tag"><i class="fa-solid fa-heart"></i> Natural speech</span>
+              <span class="tag"><i class="fa-solid fa-headphones"></i> Smooth chunk queue</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <label><i class="fa-solid fa-sliders"></i> Audio settings</label>
+            <div class="slider-item">
+              <div class="label"><span>Rate</span><strong id="rateValue">1.00x</strong></div>
+              <input id="rate" type="range" min="0.5" max="2" step="0.05" value="1" />
+            </div>
+            <div class="slider-item" style="margin-top:10px;">
+              <div class="label"><span>Pitch</span><strong id="pitchValue">1.00</strong></div>
+              <input id="pitch" type="range" min="0" max="2" step="0.05" value="1" />
+            </div>
+            <div class="slider-item" style="margin-top:10px;">
+              <div class="label"><span>Volume</span><strong id="volumeValue">100%</strong></div>
+              <input id="volume" type="range" min="0" max="1" step="0.05" value="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="extra-controls">
+          <div class="music-card">
+            <div class="row">
+              <label><i class="fa-solid fa-music"></i> Background music</label>
+              <select id="bgModeSelect">
+                <option value="none">No background music</option>
+                <option value="ambient">Ambient pad</option>
+                <option value="lofi">Lofi groove</option>
+                <option value="club">DJ club</option>
+                <option value="cinematic">Cinematic air</option>
+              </select>
+            </div>
+
+            <div class="row">
+              <div class="slider-item">
+                <div class="label"><span>Music volume</span><strong id="musicVolumeValue">22%</strong></div>
+                <input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.22" />
+              </div>
+            </div>
+
+            <div class="music-list" id="musicList">
+              <div class="music-item active" data-mode="none"><span><i class="fa-solid fa-ban"></i> Off</span><small>Speech only</small></div>
+              <div class="music-item" data-mode="ambient"><span><i class="fa-solid fa-cloud"></i> Ambient</span><small>Soft background</small></div>
+              <div class="music-item" data-mode="lofi"><span><i class="fa-solid fa-compact-disc"></i> Lofi</span><small>Warm groove</small></div>
+              <div class="music-item" data-mode="club"><span><i class="fa-solid fa-music"></i> DJ</span><small>Club style</small></div>
+              <div class="music-item" data-mode="cinematic"><span><i class="fa-solid fa-meteor"></i> Cinematic</span><small>Wide atmosphere</small></div>
+            </div>
+          </div>
+
+          <div class="music-card">
+            <div class="row">
+              <label><i class="fa-solid fa-dj"></i> DJ function</label>
+              <select id="djModeSelect">
+                <option value="off">DJ off</option>
+                <option value="announce">Announcer DJ</option>
+                <option value="hype">Hype DJ</option>
+                <option value="radio">Radio DJ</option>
+              </select>
+            </div>
+
+            <div class="row">
+              <div class="slider-item">
+                <div class="label"><span>DJ effect intensity</span><strong id="djIntensityValue">50%</strong></div>
+                <input id="djIntensity" type="range" min="0" max="1" step="0.01" value="0.5" />
+              </div>
+            </div>
+
+            <div class="download-note">
+              <i class="fa-solid fa-circle-info"></i> Browser speech can play with music live, but true mixed-audio download needs a recording engine or server-side TTS. The download button below exports your session settings for reuse.
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-head">
+            <span><i class="fa-solid fa-chart-line"></i> Playback progress</span>
+            <span id="progressText">Ready</span>
+          </div>
+          <div class="progress-bar"><span id="progressBar"></span></div>
+          <div class="small" id="chunkPreview">No chunks yet. Paste text to begin.</div>
+        </div>
+
+        <div class="buttons">
+          <button class="btn btn-primary" id="speakBtn"><i class="fa-solid fa-play"></i> Speak</button>
+          <button class="btn" id="pauseBtn"><i class="fa-solid fa-pause"></i> Pause</button>
+          <button class="btn btn-success" id="resumeBtn"><i class="fa-solid fa-forward"></i> Resume</button>
+          <button class="btn btn-danger" id="stopBtn"><i class="fa-solid fa-stop"></i> Stop</button>
+        </div>
+
+        <div class="buttons" style="margin-top:12px; grid-template-columns: 1fr 1fr;">
+          <button class="btn" id="downloadPresetBtn"><i class="fa-solid fa-file-arrow-down"></i> Download session preset</button>
+          <button class="btn" id="djStartBtn"><i class="fa-solid fa-record-vinyl"></i> DJ mode preview</button>
+        </div>
+
+        <div class="footer-line">
+          <span><i class="fa-solid fa-circle-info"></i> Long content is split into short speech-safe chunks automatically.</span>
+          <span id="speechState">Idle</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const textInput = document.getElementById('textInput');
+    const voiceSelect = document.getElementById('voiceSelect');
+    const rate = document.getElementById('rate');
+    const pitch = document.getElementById('pitch');
+    const volume = document.getElementById('volume');
+    const rateValue = document.getElementById('rateValue');
+    const pitchValue = document.getElementById('pitchValue');
+    const volumeValue = document.getElementById('volumeValue');
+    const charCount = document.getElementById('charCount');
+    const chunkCount = document.getElementById('chunkCount');
+    const chunkPreview = document.getElementById('chunkPreview');
+    const progressText = document.getElementById('progressText');
+    const progressBar = document.getElementById('progressBar');
+    const speechState = document.getElementById('speechState');
+    const voiceCount = document.getElementById('voiceCount');
+    const bgModeSelect = document.getElementById('bgModeSelect');
+    const djModeSelect = document.getElementById('djModeSelect');
+    const djIntensity = document.getElementById('djIntensity');
+    const musicVolume = document.getElementById('musicVolume');
+    const musicList = document.getElementById('musicList');
+    const musicVolumeValue = document.getElementById('musicVolumeValue');
+    const djIntensityValue = document.getElementById('djIntensityValue');
+
+    const speakBtn = document.getElementById('speakBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const loadSampleBtn = document.getElementById('loadSampleBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const refreshVoicesBtn = document.getElementById('refreshVoicesBtn');
+    const downloadPresetBtn = document.getElementById('downloadPresetBtn');
+    const djStartBtn = document.getElementById('djStartBtn');
+
+    let voices = [];
+    let currentUtterance = null;
+    let currentChunkIndex = 0;
+    let chunks = [];
+    let isStopped = false;
+    let bgInterval = null;
+    let bgOsc = null;
+    let bgGain = null;
+    let bgAudioCtx = null;
+    let isDjPreview = false;
+
+    function updateStats() {
+      const text = textInput.value || '';
+      charCount.textContent = text.length.toLocaleString();
+      chunks = splitIntoChunks(text, 220);
+      chunkCount.textContent = chunks.length.toLocaleString();
+      chunkPreview.textContent = chunks.length ? `First chunk preview: ${chunks[0].slice(0, 120)}${chunks[0].length > 120 ? '…' : ''}` : 'No chunks yet. Paste text to begin.';
+    }
+
+    function splitIntoChunks(text, maxLength = 220) {
+      const cleaned = text.replace(/\s+/g, ' ').trim();
+      if (!cleaned) return [];
+      const sentences = cleaned.match(/[^.!?]+[.!?]*|[^.!?]+$/g) || [cleaned];
+      const result = [];
+      let current = '';
+
+      for (const sentence of sentences) {
+        const s = sentence.trim();
+        if (!s) continue;
+        if ((current + ' ' + s).trim().length <= maxLength) {
+          current = (current + ' ' + s).trim();
+        } else {
+          if (current) result.push(current);
+          if (s.length <= maxLength) {
+            current = s;
+          } else {
+            const pieces = s.match(new RegExp(`.{1,${maxLength}}(\\s|$)`, 'g')) || [s];
+            for (const piece of pieces) {
+              const p = piece.trim();
+              if (p) result.push(p);
+            }
+            current = '';
+          }
+        }
+      }
+
+      if (current) result.push(current);
+      return result;
+    }
+
+    function populateVoices() {
+      voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+      const preferredOrder = voices
+        .map((v, i) => ({ v, i }))
+        .sort((a, b) => {
+          const aKey = `${a.v.default ? 0 : 1}-${a.v.lang}-${a.v.name}`;
+          const bKey = `${b.v.default ? 0 : 1}-${b.v.lang}-${b.v.name}`;
+          return aKey.localeCompare(bKey);
+        });
+
+      voiceSelect.innerHTML = '';
+      preferredOrder.forEach(({ v, i }) => {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `${v.name} — ${v.lang}${v.default ? ' (default)' : ''}`;
+        voiceSelect.appendChild(option);
+      });
+      voiceCount.textContent = voices.length.toLocaleString();
+    }
+
+    function setState(state) {
+      speechState.textContent = state;
+    }
+
+    function stopBackground() {
+      if (bgInterval) {
+        clearInterval(bgInterval);
+        bgInterval = null;
+      }
+      if (bgOsc && bgGain && bgAudioCtx) {
+        try { bgOsc.stop(); } catch (e) {}
+        bgOsc = null;
+        bgGain = null;
+      }
+      if (bgAudioCtx && bgAudioCtx.state !== 'closed') {
+        try { bgAudioCtx.close(); } catch (e) {}
+      }
+      bgAudioCtx = null;
+    }
+
+    function stopSpeech() {
+      isStopped = true;
+      window.speechSynthesis.cancel();
+      currentUtterance = null;
+      currentChunkIndex = 0;
+      progressBar.style.width = '0%';
+      progressText.textContent = 'Stopped';
+      setState('Stopped');
+      stopBackground();
+    }
+
+    function startBackgroundMusic(mode = bgModeSelect.value, intensity = parseFloat(djIntensity.value)) {
+      stopBackground();
+      if (mode === 'none') return;
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      bgAudioCtx = new AudioContextClass();
+      bgGain = bgAudioCtx.createGain();
+      bgGain.gain.value = parseFloat(musicVolume.value) * (mode === 'club' ? 1 : 0.9);
+      bgGain.connect(bgAudioCtx.destination);
+
+      const makeTone = (freq, wave = 'sine', delay = 0, duration = 1.2, vol = 0.04) => {
+        const osc = bgAudioCtx.createOscillator();
+        const gain = bgAudioCtx.createGain();
+        osc.type = wave;
+        osc.frequency.value = freq;
+        gain.gain.value = vol * intensity;
+        osc.connect(gain);
+        gain.connect(bgGain);
+        osc.start(bgAudioCtx.currentTime + delay);
+        osc.stop(bgAudioCtx.currentTime + delay + duration);
+        osc.onended = () => { try { osc.disconnect(); gain.disconnect(); } catch (e) {} };
+      };
+
+      if (mode === 'ambient') {
+        makeTone(220, 'sine', 0, 3.4, 0.05);
+        makeTone(277, 'triangle', 0.6, 3.4, 0.04);
+        makeTone(330, 'sine', 1.2, 3.4, 0.03);
+      } else if (mode === 'lofi') {
+        bgInterval = setInterval(() => {
+          makeTone(196, 'triangle', 0, 0.9, 0.06);
+          makeTone(247, 'triangle', 0.25, 0.9, 0.05);
+          makeTone(294, 'triangle', 0.5, 0.9, 0.04);
+        }, 900);
+      } else if (mode === 'club') {
+        bgInterval = setInterval(() => {
+          makeTone(110, 'sawtooth', 0, 0.12, 0.08);
+          makeTone(220, 'sawtooth', 0.12, 0.12, 0.05);
+          makeTone(440, 'square', 0.24, 0.12, 0.03);
+        }, 260);
+      } else if (mode === 'cinematic') {
+        makeTone(147, 'sine', 0, 4, 0.05);
+        makeTone(196, 'sine', 0.8, 4, 0.04);
+        makeTone(247, 'triangle', 1.6, 4, 0.03);
+      }
+    }
+
+    function speakChunk(index) {
+      if (isStopped) return;
+      if (index >= chunks.length) {
+        currentUtterance = null;
+        currentChunkIndex = 0;
+        progressBar.style.width = '100%';
+        progressText.textContent = 'Completed';
+        setState('Completed');
+        stopBackground();
+        return;
+      }
+
+      const text = chunks[index];
+      const utterance = new SpeechSynthesisUtterance(text);
+      const selectedVoice = voices[Number(voiceSelect.value)] || voices.find(v => v.default) || voices[0];
+      if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.rate = parseFloat(rate.value);
+      utterance.pitch = parseFloat(pitch.value);
+      utterance.volume = parseFloat(volume.value);
+
+      currentUtterance = utterance;
+      currentChunkIndex = index;
+      progressText.textContent = `Speaking chunk ${index + 1} of ${chunks.length}`;
+      setState(isDjPreview ? 'DJ preview' : 'Speaking');
+      progressBar.style.width = `${Math.max(2, ((index) / chunks.length) * 100)}%`;
+
+      if (index === 0) {
+        startBackgroundMusic(bgModeSelect.value, parseFloat(djIntensity.value));
+      }
+
+      utterance.onend = () => {
+        if (isStopped) return;
+        progressBar.style.width = `${((index + 1) / chunks.length) * 100}%`;
+        speakChunk(index + 1);
+      };
+
+      utterance.onerror = () => {
+        if (isStopped) return;
+        setState('Voice error — moving to next chunk');
+        speakChunk(index + 1);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function setBgActive(mode) {
+      bgModeSelect.value = mode;
+      document.querySelectorAll('.music-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.mode === mode);
+      });
+    }
+
+    speakBtn.addEventListener('click', () => {
+      const text = textInput.value.trim();
+      if (!text) {
+        alert('Please enter some text first.');
+        return;
+      }
+
+      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+      isStopped = false;
+      isDjPreview = false;
+      updateStats();
+      setState('Preparing speech...');
+      speakChunk(0);
+    });
+
+    pauseBtn.addEventListener('click', () => {
+      if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+        window.speechSynthesis.pause();
+        setState('Paused');
+        progressText.textContent = `Paused at chunk ${currentChunkIndex + 1}`;
+      }
+    });
+
+    resumeBtn.addEventListener('click', () => {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+        setState('Resumed');
+        progressText.textContent = `Speaking chunk ${currentChunkIndex + 1} of ${chunks.length}`;
+      }
+    });
+
+    stopBtn.addEventListener('click', stopSpeech);
+
+    loadSampleBtn.addEventListener('click', () => {
+      textInput.value = `Welcome to the premium text to speech studio. This editor supports long text, voice selection, background music, and DJ-style playback. You can paste articles, tutorials, scripts, blog posts, or full chapters. The app automatically splits long content into smaller chunks so playback remains stable and clean.`;
+      updateStats();
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(textInput.value || '');
+        setState('Text copied to clipboard');
+      } catch (e) {
+        alert('Copy failed in this browser.');
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      textInput.value = '';
+      updateStats();
+      stopSpeech();
+      progressText.textContent = 'Ready';
+      setState('Idle');
+    });
+
+    refreshVoicesBtn.addEventListener('click', populateVoices);
+
+    [rate, pitch, volume].forEach((input) => {
+      input.addEventListener('input', () => {
+        rateValue.textContent = `${parseFloat(rate.value).toFixed(2)}x`;
+        pitchValue.textContent = parseFloat(pitch.value).toFixed(2);
+        volumeValue.textContent = `${Math.round(parseFloat(volume.value) * 100)}%`;
+      });
+    });
+
+    musicVolume.addEventListener('input', () => {
+      musicVolumeValue.textContent = `${Math.round(parseFloat(musicVolume.value) * 100)}%`;
+      if (bgGain) bgGain.gain.value = parseFloat(musicVolume.value);
+    });
+
+    djIntensity.addEventListener('input', () => {
+      djIntensityValue.textContent = `${Math.round(parseFloat(djIntensity.value) * 100)}%`;
+    });
+
+    bgModeSelect.addEventListener('change', () => {
+      setBgActive(bgModeSelect.value);
+    });
+
+    musicList.addEventListener('click', (e) => {
+      const item = e.target.closest('.music-item');
+      if (!item) return;
+      setBgActive(item.dataset.mode);
+    });
+
+    djModeSelect.addEventListener('change', () => {
+      const mode = djModeSelect.value;
+      if (mode === 'off') {
+        bgModeSelect.value = 'none';
+        djStartBtn.innerHTML = '<i class="fa-solid fa-record-vinyl"></i> DJ mode preview';
+      } else if (mode === 'announce') {
+        bgModeSelect.value = 'ambient';
+        djStartBtn.innerHTML = '<i class="fa-solid fa-record-vinyl"></i> DJ announcer mode';
+      } else if (mode === 'hype') {
+        bgModeSelect.value = 'club';
+        djStartBtn.innerHTML = '<i class="fa-solid fa-record-vinyl"></i> DJ hype mode';
+      } else if (mode === 'radio') {
+        bgModeSelect.value = 'lofi';
+        djStartBtn.innerHTML = '<i class="fa-solid fa-record-vinyl"></i> DJ radio mode';
+      }
+      setBgActive(bgModeSelect.value);
+    });
+
+    djStartBtn.addEventListener('click', () => {
+      const text = textInput.value.trim();
+      if (!text) {
+        alert('Please enter some text first.');
+        return;
+      }
+      if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+      isStopped = false;
+      isDjPreview = true;
+      updateStats();
+      setState('DJ preview running');
+      if (djModeSelect.value === 'off') {
+        bgModeSelect.value = 'club';
+      }
+      speakChunk(0);
+    });
+
+    downloadPresetBtn.addEventListener('click', () => {
+      const session = {
+        text: textInput.value,
+        voiceIndex: voiceSelect.value,
+        rate: rate.value,
+        pitch: pitch.value,
+        volume: volume.value,
+        backgroundMode: bgModeSelect.value,
+        backgroundVolume: musicVolume.value,
+        djMode: djModeSelect.value,
+        djIntensity: djIntensity.value,
+        timestamp: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tts-session-preset.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setState('Session preset downloaded');
+    });
+
+    if ('speechSynthesis' in window) {
+      populateVoices();
+      window.speechSynthesis.onvoiceschanged = populateVoices;
+    } else {
+      voiceSelect.innerHTML = '<option>Speech synthesis not supported</option>';
+      voiceCount.textContent = '0';
+      speakBtn.disabled = true;
+      pauseBtn.disabled = true;
+      resumeBtn.disabled = true;
+      stopBtn.disabled = true;
+      setState('Web Speech API not supported');
+    }
+
+    updateStats();
+    rateValue.textContent = `${parseFloat(rate.value).toFixed(2)}x`;
+    pitchValue.textContent = parseFloat(pitch.value).toFixed(2);
+    volumeValue.textContent = `${Math.round(parseFloat(volume.value) * 100)}%`;
+    musicVolumeValue.textContent = `${Math.round(parseFloat(musicVolume.value) * 100)}%`;
+    djIntensityValue.textContent = `${Math.round(parseFloat(djIntensity.value) * 100)}%`;
+    setBgActive('none');
+  </script>
+</body>
+</html>
